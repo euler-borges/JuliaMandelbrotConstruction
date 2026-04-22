@@ -1,7 +1,20 @@
 #imports
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 import math
+
+
+def exibir_ou_salvar(nome_arquivo="images/mandelbrot_zd.png"):
+    backend = plt.get_backend().lower()
+    if "agg" in backend:
+        pasta_saida = os.path.dirname(nome_arquivo)
+        if pasta_saida:
+            os.makedirs(pasta_saida, exist_ok=True)
+        plt.savefig(nome_arquivo, dpi=300, bbox_inches="tight")
+        print(f"Backend nao interativo detectado ({backend}). Figura salva em {nome_arquivo}.")
+    else:
+        plt.show()
 
 #calcula a órbita de um ponto para z^d
 #recebe c, d e o máximo de iterações a se realizar
@@ -67,7 +80,7 @@ def visualizar_conjunto_mandel_zd(n, d, N):
     plt.plot(np.real(matrizBlack), np.imag(matrizBlack), 'o', markersize = 0.1, color = colors[7])            
 
 
-    plt.show()
+    exibir_ou_salvar()
 
 if __name__ == "__main__":
     # entre com o número de divisões que quer fazer, qual d quer plotar e quantas iteradas para cada ponto

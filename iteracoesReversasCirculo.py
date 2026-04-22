@@ -1,9 +1,22 @@
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
 import math
 
-RANG = 200000
+RANG = 10000
+
+
+def exibir_ou_salvar(nome_arquivo="images/iteracoesReversasCirculo.png"):
+    backend = plt.get_backend().lower()
+    if "agg" in backend:
+        pasta_saida = os.path.dirname(nome_arquivo)
+        if pasta_saida:
+            os.makedirs(pasta_saida, exist_ok=True)
+        plt.savefig(nome_arquivo, dpi=300, bbox_inches="tight")
+        print(f"Backend nao interativo detectado ({backend}). Figura salva em {nome_arquivo}.")
+    else:
+        plt.show()
 
 def raiz_d(circulo, d):
     raiz_proxima = []
@@ -49,4 +62,4 @@ plotaRaizes(circulo)
 #plt.text(0.22, 0.61, "A", fontsize = 10)
 #plt.text(-0.6, 0, "B", fontsize = 10)
 #plt.text(0.23, -0.5, "C", fontsize = 10)
-plt.show()
+exibir_ou_salvar()

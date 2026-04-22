@@ -1,11 +1,23 @@
 
-
+import os
 import math 
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
 
 lado = 2
+
+
+def exibir_ou_salvar(nome_arquivo="images/julia_zd.png"):
+    backend = plt.get_backend().lower()
+    if "agg" in backend:
+        pasta_saida = os.path.dirname(nome_arquivo)
+        if pasta_saida:
+            os.makedirs(pasta_saida, exist_ok=True)
+        plt.savefig(nome_arquivo, dpi=300, bbox_inches="tight")
+        print(f"Backend nao interativo detectado ({backend}). Figura salva em {nome_arquivo}.")
+    else:
+        plt.show()
 
 
 def orbita(z, c, d, n_max):
@@ -65,7 +77,7 @@ def visualizar_conjunto_julia(c, n, d, N):
     plt.title(f"Conjunto de Julia para d = {d} e c = {c}")
     plt.xlabel("Parte Real")
     plt.ylabel("Parte Imaginária")
-    plt.show()
+    exibir_ou_salvar()
 
 #visualizar_conjunto_julia(a, b, c)
 # Exemplo: Visualizar o conjunto de Julia para c = a, lado do grid indo de -c a c e dividindo o grid em b^2 pontos a serem analisados
