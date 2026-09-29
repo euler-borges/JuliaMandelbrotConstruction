@@ -1,49 +1,35 @@
+#!/usr/bin/env python3
+"""
+Script legado: juliaReverseCompleto.py
+Refatorado na Fase 2 para integrar com a arquitetura modular juliamandelbrot,
+preservando 100% de compatibilidade com chamadas de função e uso via CLI/interativo.
+"""
+
 import os
 import sys
 import argparse
-import numpy as np
-import matplotlib.pyplot as plt
-import random as rd
+from pathlib import Path
 
+src_path = str(Path(__file__).resolve().parent / "src")
+if src_path not in sys.path:
+    sys.path.insert(0, src_path)
 
-def parse_complex(valor: str) -> complex:
-    s = valor.strip().replace(" ", "").replace("i", "j").replace("I", "J")
-    try:
-        return complex(s)
-    except ValueError as err:
-        raise argparse.ArgumentTypeError(f"Número complexo inválido: '{valor}'") from err
-
-
-def exibir_ou_salvar(nome_arquivo="images/juliaReverseCompleto.png", show=None):
-    backend = plt.get_backend().lower()
-    pasta_saida = os.path.dirname(nome_arquivo)
-    if pasta_saida:
-        os.makedirs(pasta_saida, exist_ok=True)
-    plt.savefig(nome_arquivo, dpi=300, bbox_inches="tight")
-    print(f"Figura salva em {nome_arquivo}.")
-    if show is True or (show is None and "agg" not in backend):
-        plt.show()
-    plt.close()
+from juliamandelbrot.core.dynamics import calcular_julia_reverso
+from juliamandelbrot.rendering.plotter import renderizar_julia_reverso, exibir_ou_salvar
+from juliamandelbrot.utils.parser import parse_complex
 
 
 def visualizar_conjunto_julia(c, n, d, nome_arquivo="images/juliaReverseCompleto.png", show=None, seed=None):
-    if seed is not None:
-        rd.seed(seed)
-        np.random.seed(seed)
-
-    matriz = np.zeros(n, dtype=np.complex128)
-    ponto = complex(0.5, 0.5)
-
-    for i in range(n):
-        aleatorio = rd.randrange(d)
-        ponto = np.power((ponto - c), 1/d)*np.exp((np.pi*2*aleatorio/d)*1j)
-        matriz[i] = ponto
-
-    plt.plot(np.real(matriz), np.imag(matriz), 'o', markersize=0.3, color='blue')
-    plt.title(f"Conjunto de Julia para c = {c}")
-    plt.xlabel("Parte Real")
-    plt.ylabel("Parte Imaginária")
-    exibir_ou_salvar(nome_arquivo=nome_arquivo, show=show)
+    """Função legada para compatibilidade de API."""
+    pontos = calcular_julia_reverso(c=c, d=d, n=n, seed=seed)
+    show_flag = False if show is False else (True if show is True else None)
+    renderizar_julia_reverso(
+        pontos=pontos,
+        c=c,
+        d=d,
+        nome_arquivo=nome_arquivo,
+        show=show_flag if show_flag is not None else False,
+    )
 
 
 if __name__ == "__main__":
@@ -69,4 +55,3 @@ if __name__ == "__main__":
         n_val = int(input("Quantas iterações deseja realizar? "))
         d_val = int(input("Qual o 'd' desejado? "))
         visualizar_conjunto_julia(c_val, n_val, d_val)
-

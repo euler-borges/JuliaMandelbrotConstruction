@@ -1,64 +1,58 @@
+#!/usr/bin/env python3
+"""
+Script legado: iteracoesReversasCirculo.py
+Refatorado na Fase 2 para integrar com a arquitetura modular juliamandelbrot,
+preservando 100% de compatibilidade com chamadas de função e uso via CLI/interativo.
+"""
+
 import os
 import sys
 import argparse
-import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib.colors import LinearSegmentedColormap
-import math
+from pathlib import Path
+
+src_path = str(Path(__file__).resolve().parent / "src")
+if src_path not in sys.path:
+    sys.path.insert(0, src_path)
+
+from juliamandelbrot.core.dynamics import (
+    construir_circulo,
+    raiz_d_circulo,
+    calcular_pre_imagens_circulo,
+)
+from juliamandelbrot.rendering.plotter import (
+    renderizar_pre_imagens_circulo,
+    exibir_ou_salvar,
+)
 
 RANG = 10000
 
 
-def exibir_ou_salvar(nome_arquivo="images/iteracoesReversasCirculo.png", show=None):
-    backend = plt.get_backend().lower()
-    pasta_saida = os.path.dirname(nome_arquivo)
-    if pasta_saida:
-        os.makedirs(pasta_saida, exist_ok=True)
-    plt.savefig(nome_arquivo, dpi=300, bbox_inches="tight")
-    print(f"Figura salva em {nome_arquivo}.")
-    if show is True or (show is None and "agg" not in backend):
-        plt.show()
-    plt.close()
+def constroiCirculo(rang):
+    """Função legada para compatibilidade de API."""
+    return construir_circulo(rang=rang)
 
 
 def raiz_d(circulo, d):
-    raiz_proxima = []
-    for i in range(len(circulo)):
-        p = 0
-        raiz_calculada = np.power(circulo[i]-3, 1/d) 
-        while p < d:
-            raiz_proxima.append(raiz_calculada*np.exp(1j*2*math.pi*p/d))
-            p += 1
-    return raiz_proxima
-
-
-def constroiCirculo(RANG):
-    circulo = []
-    for i in range(RANG):
-        circulo.append((math.cos(2*math.pi*i/RANG)+ 1j*math.sin(2*math.pi*i/RANG))*3)
-    return circulo
+    """Função legada para compatibilidade de API."""
+    return raiz_d_circulo(circulo, d)
 
 
 def executar_simulacao_circulo(d, n, rang=10000, nome_arquivo="images/iteracoesReversasCirculo.png", show=None):
-    circulo = constroiCirculo(rang)
-
-    plt.figure(figsize=(8, 8))
-    plt.title("Raiz do círculo")
-    plt.xlabel("Parte Real")
-    plt.ylabel("Parte Imaginária")
-    plt.plot(np.real(circulo), np.imag(circulo), 'o', markersize=1, color="black")
-
-    if n > 0:
-        raiz = raiz_d(circulo, d)
-        plt.plot(np.real(raiz), np.imag(raiz), 'o', markersize=1, color="black")
-        for _ in range(n - 1):
-            raiz = raiz_d(raiz, d)
-            plt.plot(np.real(raiz), np.imag(raiz), 'o', markersize=1, color="black")
-
-    exibir_ou_salvar(nome_arquivo=nome_arquivo, show=show)
+    """Função legada para compatibilidade de API."""
+    circulo_base = construir_circulo(rang=rang)
+    pre_imagens = calcular_pre_imagens_circulo(circulo_base=circulo_base, d=d, n_rounds=n)
+    show_flag = False if show is False else (True if show is True else None)
+    renderizar_pre_imagens_circulo(
+        circulo_base=circulo_base,
+        pre_imagens_por_rodada=pre_imagens,
+        d=d,
+        nome_arquivo=nome_arquivo,
+        show=show_flag if show_flag is not None else False,
+    )
 
 
 def plotaRaizes(circulo):
+    """Função legada interativa para compatibilidade de API."""
     d = int(input("Raiz de que grau? "))
     n = int(input("Quantas iteradas? "))
     executar_simulacao_circulo(d, n, rang=len(circulo))

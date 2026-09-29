@@ -8,8 +8,8 @@ Este documento estabelece o plano estratégico de engenharia de software para tr
 
 ```mermaid
 flowchart TD
-    Fase1["Fase 1: Interface de Linha de Comando (CLI)<br><i>(Prioridade Imediata - Concluída)</i>"] --> Fase2["Fase 2: Arquitetura Modular & Desacoplamento"]
-    Fase2 --> Fase3["Fase 3: Vetorização NumPy & Desempenho Massivo"]
+    Fase1["Fase 1: Interface de Linha de Comando (CLI)<br><i>(Concluída ✅)</i>"] --> Fase2["Fase 2: Arquitetura Modular & Desacoplamento<br><i>(Concluída ✅)</i>"]
+    Fase2 --> Fase3["Fase 3: Vetorização NumPy & Desempenho Massivo<br><i>(Próxima Etapa ⏳)</i>"]
     Fase3 --> Fase4["Fase 4: Testes Automatizados (pytest) & Qualidade"]
     Fase4 --> Fase5["Fase 5: Empacotamento pyproject.toml & Animações"]
 ```
@@ -19,11 +19,11 @@ flowchart TD
 ## 📍 Detalhamento das Fases
 
 ### Fase 1: Interface de Linha de Comando (CLI) & Usabilidade
-> **Status:** Prioridade imediata / Em andamento.
+> **Status:** Concluída ✅.
 > **Impacto:** Eliminação de atrito operacional e desbloqueio para automação.
 
 - **Diagnóstico:** Os scripts originais continham chamadas bloqueantes a `input()`, impedindo seu uso em scripts de terminal, pipelines de CI ou servidores sem terminal interativo.
-- **Ações:**
+- **Ações Realizadas:**
   1. Criação do módulo unificado `cli.py` utilizando `argparse` (biblioteca nativa do Python, dispensando novas dependências).
   2. Implementação de subcomandos padronizados: `julia`, `mandelbrot`, `reverse`, `circle`.
   3. Adição de suporte a argumentos nos scripts legados (`julia_zd.py`, `mandelbrot_zd.py`, etc.) com modo de compatibilidade (fallback para `input()` caso nenhum argumento seja passado).
@@ -33,13 +33,14 @@ flowchart TD
 ---
 
 ### Fase 2: Arquitetura Modular & Desacoplamento
+> **Status:** Concluída ✅.
 > **Impacto:** Reusabilidade do código, facilidade de manutenção e extinção de código duplicado.
 
 - **Diagnóstico:**
   - Código matemático (cálculo de órbitas) acoplado diretamente a chamadas de visualização (`plt.plot()`) e entrada de usuário.
   - A função `exibir_ou_salvar()` e as listas de paletas de cores estavam repetidas nos arquivos.
   - O script `iteracoesReversasCirculo.py` executava instruções globais ao ser importado.
-- **Estrutura Alvo Proposta:**
+- **Estrutura Implementada:**
   ```text
   JuliaMandelbrotConstruction/
   ├── cli.py                     # Ponto de entrada CLI simplificado

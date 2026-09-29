@@ -1,88 +1,39 @@
-#imports
+#!/usr/bin/env python3
+"""
+Script legado: mandelbrot_zd.py
+Refatorado na Fase 2 para integrar com a arquitetura modular juliamandelbrot,
+preservando 100% de compatibilidade com chamadas de função e uso via CLI/interativo.
+"""
+
 import os
 import sys
 import argparse
-import numpy as np
-import matplotlib.pyplot as plt
-import math
+from pathlib import Path
+
+src_path = str(Path(__file__).resolve().parent / "src")
+if src_path not in sys.path:
+    sys.path.insert(0, src_path)
+
+from juliamandelbrot.core.mandelbrot import calcular_orbita_mandelbrot, calcular_grid_mandelbrot
+from juliamandelbrot.rendering.plotter import renderizar_mandelbrot_grade, exibir_ou_salvar
 
 
-def exibir_ou_salvar(nome_arquivo="images/mandelbrot_zd.png", show=None):
-    backend = plt.get_backend().lower()
-    pasta_saida = os.path.dirname(nome_arquivo)
-    if pasta_saida:
-        os.makedirs(pasta_saida, exist_ok=True)
-    plt.savefig(nome_arquivo, dpi=300, bbox_inches="tight")
-    print(f"Figura salva em {nome_arquivo}.")
-    if show is True or (show is None and "agg" not in backend):
-        plt.show()
-    plt.close()
-
-#calcula a órbita de um ponto para z^d
-#recebe c, d e o máximo de iterações a se realizar
-#retorna c e o número de iteradas gastas para se extravasar o limite
 def orbitaM_zd(c, d, n_max):
-    ponto = 0
-    i = 0
-    for i in range(n_max):
-        ponto = ponto**d + c
-        if abs(ponto) > 3:  
-            return (c, i)
-    return (c, n_max)
+    """Função legada para compatibilidade de API."""
+    return calcular_orbita_mandelbrot(c, d, n_max)
 
-#recebe o número de pontos que se dividirá cada eixo, o valor de d e o número de iteradas para cada c(N)
+
 def visualizar_conjunto_mandel_zd(n, d, N, nome_arquivo="images/mandelbrot_zd.png", show=None):
-    #Determinando a largura da tela baseando-se no critério de escape
-    lado = 2**(1/(d-1)) if d > 1 else 2.0
+    """Função legada para compatibilidade de API."""
+    lado, matrizes = calcular_grid_mandelbrot(d=d, n=n, n_max=N)
+    show_flag = False if show is False else (True if show is True else None)
+    renderizar_mandelbrot_grade(
+        matrizes_por_faixa=matrizes,
+        d=d,
+        nome_arquivo=nome_arquivo,
+        show=show_flag if show_flag is not None else False,
+    )
 
-    
-    colors = ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet', "black"]  # Lista de cores a serem utilizadas para colorir cada ponto
-    #listas para se colocar os pontos conforme as cores  
-    matrizRed = []
-    matrizOrange = []
-    matrizYellow = []
-    matrizGreen = []
-    matrizBlue = []
-    matrizIndigo = []
-    matrizViolet = []
-    matrizBlack = []
-
-
-    for i, x in enumerate(np.linspace(-lado, lado, n)):
-        for j, y in enumerate(np.linspace(-lado, lado, n)):
-            ponto, iteradas = orbitaM_zd(complex(x, y), d, N)  
-            
-            aux = math.floor(iteradas * (len(colors)-1) /N)
-            if (aux) == 0:
-                matrizRed.append(ponto)
-            elif (aux) == 1:
-                matrizOrange.append(ponto)
-            elif (aux) == 2:
-                matrizYellow.append(ponto)
-            elif (aux) == 3:
-                matrizGreen.append(ponto)
-            elif (aux) == 4:
-                matrizBlue.append(ponto)
-            elif (aux) == 5:
-                matrizIndigo.append(ponto)
-            elif (aux) == 6:
-                matrizViolet.append(ponto)
-            else:
-                matrizBlack.append(ponto)
-
-
-
-    plt.plot(np.real(matrizRed), np.imag(matrizRed), 'o', markersize = 0.1, color = colors[0])            
-    plt.plot(np.real(matrizOrange), np.imag(matrizOrange), 'o', markersize = 0.1, color = colors[1])            
-    plt.plot(np.real(matrizYellow), np.imag(matrizYellow), 'o', markersize = 0.1, color = colors[2])            
-    plt.plot(np.real(matrizGreen), np.imag(matrizGreen), 'o', markersize = 0.1, color = colors[3])            
-    plt.plot(np.real(matrizBlue), np.imag(matrizBlue), 'o', markersize = 0.1, color = colors[4])            
-    plt.plot(np.real(matrizIndigo), np.imag(matrizIndigo), 'o', markersize = 0.1, color = colors[5])            
-    plt.plot(np.real(matrizViolet), np.imag(matrizViolet), 'o', markersize = 0.1, color = colors[6])            
-    plt.plot(np.real(matrizBlack), np.imag(matrizBlack), 'o', markersize = 0.1, color = colors[7])            
-
-
-    exibir_ou_salvar(nome_arquivo=nome_arquivo, show=show)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Conjunto de Mandelbrot / Multibrot.")
