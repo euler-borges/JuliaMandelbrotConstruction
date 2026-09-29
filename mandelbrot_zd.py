@@ -1,20 +1,22 @@
 #imports
 import os
+import sys
+import argparse
 import numpy as np
 import matplotlib.pyplot as plt
 import math
 
 
-def exibir_ou_salvar(nome_arquivo="images/mandelbrot_zd.png"):
+def exibir_ou_salvar(nome_arquivo="images/mandelbrot_zd.png", show=None):
     backend = plt.get_backend().lower()
-    if "agg" in backend:
-        pasta_saida = os.path.dirname(nome_arquivo)
-        if pasta_saida:
-            os.makedirs(pasta_saida, exist_ok=True)
-        plt.savefig(nome_arquivo, dpi=300, bbox_inches="tight")
-        print(f"Backend nao interativo detectado ({backend}). Figura salva em {nome_arquivo}.")
-    else:
+    pasta_saida = os.path.dirname(nome_arquivo)
+    if pasta_saida:
+        os.makedirs(pasta_saida, exist_ok=True)
+    plt.savefig(nome_arquivo, dpi=300, bbox_inches="tight")
+    print(f"Figura salva em {nome_arquivo}.")
+    if show is True or (show is None and "agg" not in backend):
         plt.show()
+    plt.close()
 
 #calcula a órbita de um ponto para z^d
 #recebe c, d e o máximo de iterações a se realizar
@@ -29,9 +31,9 @@ def orbitaM_zd(c, d, n_max):
     return (c, n_max)
 
 #recebe o número de pontos que se dividirá cada eixo, o valor de d e o número de iteradas para cada c(N)
-def visualizar_conjunto_mandel_zd(n, d, N):
+def visualizar_conjunto_mandel_zd(n, d, N, nome_arquivo="images/mandelbrot_zd.png", show=None):
     #Determinando a largura da tela baseando-se no critério de escape
-    lado = 2**(1/(d-1))
+    lado = 2**(1/(d-1)) if d > 1 else 2.0
 
     
     colors = ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet', "black"]  # Lista de cores a serem utilizadas para colorir cada ponto
@@ -80,12 +82,27 @@ def visualizar_conjunto_mandel_zd(n, d, N):
     plt.plot(np.real(matrizBlack), np.imag(matrizBlack), 'o', markersize = 0.1, color = colors[7])            
 
 
-    exibir_ou_salvar()
+    exibir_ou_salvar(nome_arquivo=nome_arquivo, show=show)
 
 if __name__ == "__main__":
-    # entre com o número de divisões que quer fazer, qual d quer plotar e quantas iteradas para cada ponto
-    print("Forneca números inteiros para os questionamentos a seguir")
-    n = int(input("Quer dividir os eixor em quantas partes?(recomenda-se um número alto)  "))
-    d = int(input("Qual o conjunto que deseja plotar?(especifique o d)  "))
-    N = int(input("Quantas iteradas deseja fazer para cada c?(números altos implicam em maior precisão, entretanto podem sobrecarregar seu computador, recomenda-se algo entre 50 e 100) "))
-    visualizar_conjunto_mandel_zd(n, d, N)
+    parser = argparse.ArgumentParser(description="Conjunto de Mandelbrot / Multibrot.")
+    parser.add_argument("-d", "--degree", type=int, help="Grau d do polinômio")
+    parser.add_argument("-n", "--resolution", type=int, help="Resolução da grade nxn")
+    parser.add_argument("-N", "--iterations", type=int, help="Número de iterações máximas")
+    parser.add_argument("-o", "--output", default="images/mandelbrot_zd.png", help="Arquivo de saída (padrão: images/mandelbrot_zd.png)")
+    parser.add_argument("--no-show", action="store_true", help="Não abre a janela gráfica do Matplotlib")
+    parser.add_argument("--show", action="store_true", help="Força a exibição da janela gráfica")
+
+    if len(sys.argv) > 1:
+        args = parser.parse_args()
+        d_val = args.degree if args.degree is not None else 2
+        n_val = args.resolution if args.resolution is not None else 600
+        N_val = args.iterations if args.iterations is not None else 80
+        show_flag = False if args.no_show else (True if args.show else None)
+        visualizar_conjunto_mandel_zd(n_val, d_val, N_val, nome_arquivo=args.output, show=show_flag)
+    else:
+        print("Forneca números inteiros para os questionamentos a seguir (ou use flags CLI via --help):")
+        n_val = int(input("Quer dividir os eixos em quantas partes?(recomenda-se um número alto)  "))
+        d_val = int(input("Qual o conjunto que deseja plotar?(especifique o d)  "))
+        N_val = int(input("Quantas iteradas deseja fazer para cada c?(números altos implicam em maior precisão, entretanto podem sobrecarregar seu computador, recomenda-se algo entre 50 e 100) "))
+        visualizar_conjunto_mandel_zd(n_val, d_val, N_val)

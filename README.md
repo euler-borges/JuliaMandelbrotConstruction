@@ -17,9 +17,34 @@ From the project directory, run:
 python3 -m pip install --upgrade pip
 python3 -m pip install -r requirements.txt
 
+## Documentation & Improvement Roadmap
+
+Comprehensive documentation and procedures for improving the project are available in the [`docs/`](docs/README.md) directory:
+- [01. Manual de Uso por Linha de Comando (CLI)](docs/01_manual_cli.md)
+- [02. Roteiro Estruturado de Melhorias (Roadmap)](docs/02_roteiro_melhorias.md)
+- [03. Guia Técnico de Refatoração e Código](docs/03_guia_refatoracao_e_codigo.md)
+
 ## How To Run
 
-All scripts are interactive (they prompt for parameters in the terminal).
+The project can be executed via the **Unified CLI (`cli.py`)**, via **command-line flags** on individual scripts, or in **interactive mode** (prompting for input when no flags are supplied).
+
+### Quickstart with Unified CLI (`cli.py`)
+
+```bash
+# Julia Set
+python3 cli.py julia -c "-0.4+0.6j" -d 2 -n 600 -N 80 -o images/julia_zd.png
+
+# Mandelbrot Set
+python3 cli.py mandelbrot -d 2 -n 600 -N 80 -o images/mandelbrot_zd.png
+
+# Reverse Stochastic Julia
+python3 cli.py reverse -c "-1+0j" -d 2 -n 100000 -o images/juliaReverseCompleto.png
+
+# Circle Reverse Iteration
+python3 cli.py circle -d 2 -n 2 --rang 10000 -o images/iteracoesReversasCirculo.png
+```
+
+---
 
 ### 1) Julia Set by Forward Orbit Iteration
 
